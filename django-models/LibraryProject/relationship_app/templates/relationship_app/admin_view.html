@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <p>Welcome, {{ user.username }}! (Role: {{ user.userprofile.role }})</p>
+    
+    <h2>System Users</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Last Login</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user_obj in users %}
+            <tr>
+                <td>{{ user_obj.username }}</td>
+                <td>{{ user_obj.email }}</td>
+                <td>{{ user_obj.userprofile.role }}</td>
+                <td>{{ user_obj.last_login }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <nav>
+        <a href="{% url 'book-list' %}">View Books</a> |
+        <a href="{% url 'library-list' %}">View Libraries</a> |
+        <a href="{% url 'logout' %}">Logout</a>
+    </nav>
+</body>
+</html>

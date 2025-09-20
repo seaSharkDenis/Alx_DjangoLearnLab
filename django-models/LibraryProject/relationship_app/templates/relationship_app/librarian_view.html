@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Librarian Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <h1>Librarian Dashboard</h1>
+    <p>Welcome, {{ user.username }}! (Role: {{ user.userprofile.role }})</p>
+    
+    <h2>Book Inventory</h2>
+    <ul>
+        {% for book in books %}
+        <li>{{ book.title }} by {{ book.author.name }}</li>
+        {% endfor %}
+    </ul>
+    
+    <h2>Libraries</h2>
+    <ul>
+        {% for library in libraries %}
+        <li>{{ library.name }}</li>
+        {% endfor %}
+    </ul>
+    
+    <nav>
+        <a href="{% url 'book-list' %}">View All Books</a> |
+        <a href="{% url 'library-list' %}">View All Libraries</a> |
+        <a href="{% url 'logout' %}">Logout</a>
+    </nav>
+</body>
+</html>

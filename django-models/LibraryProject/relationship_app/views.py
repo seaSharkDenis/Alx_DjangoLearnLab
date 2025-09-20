@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.contrib import messages
-from .models import Book, Author
+from django.contrib.auth.models import User
+from .models import Book, Author, UserProfile
 from .models import Library
 
 # Create your views here.
@@ -37,9 +38,14 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # Set default role as Member for new users
+            user_profile = UserProfile.obkjects.get(user=user)
+            user_profile.role = 'Member'
+            user_profile.save()
+
             login(request, user)  # log in new user
-            messages.success(request, "Registration successful!")
-            return redirect("bool-list")  # redirect to home page
+            messages.success(request, "Registration successful! You now have a member role.")
+            return redirect("book-list")  # redirect to home page
     else:
         form = UserCreationForm()
     return render(request, "relationship_app/register.html", {"form": form})
@@ -76,20 +82,31 @@ def is_librarian(user):
 def is_member(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
+#Role Based Views
 # Admin view
+@login_required
 @user_passes_test(is_admin)
 def admin_view(request):
-    return render(request, "relationship_app/admin_view.html")
+    users = User.objects.all()
+    return render(request, "relationship_app/admin_view.html", {'users':users})
 
 # Librarian view
+@login_required
 @user_passes_test(is_librarian)
 def librarian_view(request):
-    return render(request, "relationship_app/librarian_view.html")
+    books = Book.objects.all()
+    libraries = Library.objects.all()
+    return render(request, "relationship_app/librarian_view.html",{
+        'books':books,
+        'libraries':libraries
+    })
 
 # Member view
+@login_required
 @user_passes_test(is_member)
 def member_view(request):
-    return render(request, "relationship_app/member_view.html")
+    books = Book.object.all()
+    return render(request, "relationship_app/member_view.html", {'books':books})
 
 # Add book view
 @permission_required('relationship_app.can_add_book', raise_exception=True)
