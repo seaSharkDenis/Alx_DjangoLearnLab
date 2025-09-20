@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from django.views.generic import DetailView, ListView
+from django.views.generic.detail import DetailView, ListView
 from .models import Book, Author
 from .models import Library
 
