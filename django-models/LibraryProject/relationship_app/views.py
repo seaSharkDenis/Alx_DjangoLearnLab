@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.decorators import permission_required, user_passes_test
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.contrib import messages
 from .models import Book, Author
 from .models import Library
 
@@ -31,13 +32,14 @@ class LibraryListView(ListView):
 
 # --- Authentication Views ---
 # Register view
-def register(request):
+def register_view(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)  # log in new user
-            return redirect("home")  # redirect to home page
+            messages.success(request, "Registration successful!")
+            return redirect("bool-list")  # redirect to home page
     else:
         form = UserCreationForm()
     return render(request, "relationship_app/register.html", {"form": form})
@@ -47,17 +49,22 @@ def login_view(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            return redirect("home")
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f"Welcome back, {username}!")
+                return redirect("book-list")
     else:
         form = AuthenticationForm()
-    return render(request, "login.html", {"form": form})
+    return render(request, "relationship_app/login.html", {"form": form})
 
 # Logout view
 def logout_view(request):
     logout(request)
-    return redirect("home")
+    messages.info(request, "You have been logged out successfully.")
+    return render(request, "relationship_app/logout.html")
 
 # Check functions
 def is_admin(user):
