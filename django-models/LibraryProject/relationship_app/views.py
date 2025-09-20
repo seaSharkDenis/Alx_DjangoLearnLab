@@ -4,14 +4,15 @@ from django.contrib.auth.decorators import permission_required, user_passes_test
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from django.views.generic.detail import DetailView, ListView
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 from .models import Book, Author
 from .models import Library
 
 # Create your views here.
 
 # Function-based view to list all books
-def book_list(request):
+def list_books(request):
     """View that displays all books"""
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
@@ -90,7 +91,7 @@ def add_book(request):
         form = BookForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('book_list')
+            return redirect('book-list')
     else:
         form = BookForm()
     return render(request, 'add_book.html', {'form': form})
@@ -103,7 +104,7 @@ def edit_book(request, pk):
         form = BookForm(request.POST, instance=book)
         if form.is_valid():
             form.save()
-            return redirect('book_list')
+            return redirect('book-list')
     else:
         form = BookForm(instance=book)
     return render(request, 'edit_book.html', {'form': form})
@@ -114,5 +115,5 @@ def delete_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
     if request.method == 'POST':
         book.delete()
-        return redirect('book_list')
+        return redirect('book-list')
     return render(request, 'delete_book.html', {'book': book})
